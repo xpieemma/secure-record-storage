@@ -37,19 +37,26 @@ Install dependencies:
 
 ```bash
 npm install
+```
 Create a .env file in the root directory:
 
 ```text
 MONGO_URI=mongodb://127.0.0.1:27017/notesdb
 JWT_SECRET=your_super_secret_key_change_this
+```
+
 Start the server:
 
 ```bash
 npm start
+```
+
 For development with auto‑restart:
 
 ```bash
 npm run dev
+```
+
 The API will be available at http://localhost:3001.
 
 API Endpoints
@@ -89,6 +96,8 @@ curl -X POST http://localhost:3001/api/notes \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{"title":"My Secret","content":"This is private"}'
+```
+
 Example: Update a note (owner only)
 
 ```bash
@@ -96,56 +105,50 @@ curl -X PUT http://localhost:3001/api/notes/<note_id> \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{"title":"Updated Title"}'
+```
+
 Example: Delete a note (owner only)
 
 ```bash
 curl -X DELETE http://localhost:3001/api/notes/<note_id> \
   -H "Authorization: Bearer <token>"
+```
+
 Security Implementation
+  
 1. Authentication Middleware
 All /api/notes routes are protected by authMiddleware.
-
 The middleware extracts the JWT from the Authorization header, verifies it, and attaches req.user (the decoded user data).
 
 2. Ownership Checks
 Each note document contains a user field (ObjectId reference to User).
-
 GET /: Note.find({ user: req.user._id }) – only returns notes owned by the user.
-
 POST /: Note.create({ ...req.body, user: req.user._id }) – assigns the owner.
-
 PUT /:id and DELETE /:id:
 Fetch the note, compare note.user with req.user._id (using .equals() for ObjectIds).
 If mismatch → 403 Forbidden.
 
 3. Password Security
 Passwords are hashed with bcrypt (10 salt rounds) before saving.
-
 The pre('save') hook uses an async function without next for Mongoose 7+ compatibility.
-
 Testing
 A comprehensive test script is included (test.js). It:
-
 Registers two users (Alice and Bob).
-
 Creates a note as Alice.
-
 Verifies Alice can update and delete her own note.
-
 Verifies Bob cannot update or delete Alice’s note (returns 403).
-
 Confirms notes are isolated per user.
-
 Run the test (server must be running):
 
 ```bash
 node test.js
-
+```
 
 Expected output: all tests pass with ✅ indicators.
 
 Project Structure
-text
+```bash
+Project
 ├── config/
 │   └── connection.js          # MongoDB connection
 ├── models/
